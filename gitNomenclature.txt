@@ -1,0 +1,30 @@
+Please read this before working on the project !
+
+> GIT <
+
+-- Branch --
+> Workflow
+	- Master 	: the latest approved version, no bugs, only merge approved features
+	- Dev 	: the main work branch, used for merge and test every changes
+	- [name]	: create a new branch for each features
+	- Merge 	: to merge commit from the other repo
+
+
+> Commit convention
+commit msg 		 :	[keyword(s)] : [title]
+commit description :	short description (wich features/bug/ect..)   // Optionnal
+
+keywords :
+- FEAT	: new feature
+- FIX		: fix a bug
+- PERF	: optimization (load/fps/importation/huge code improvment)
+- DOC		: add a new doc or comments in code
+- REFACTO 	: editing code for make it cleaner
+- LD 		: editing scene/prefabs and integration
+- DEBUG 	: tools or display for debugging
+- ASSET	: import new in game assets
+- IMPORT 	: import other files (different that doc or assets) like code packages
+- CLEAN	: organize files hierarchy
+
+Exemple : [feat/fix] PlayerController + fix index error NbrPlayers
+	  [LD/assets] Player Prefabs + Import player animations
