@@ -6,6 +6,8 @@ namespace technical.test.editor
     public class SceneGizmoAsset : ScriptableObject
     {
         [SerializeField] private Gizmo[] _gizmos = default;
+        public Gizmo[] Gizmos => _gizmos;
+        
 
         public override string ToString()
         {
