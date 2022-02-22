@@ -14,7 +14,7 @@ namespace Rendu.Ulysse.editor
         {
             if (GUILayout.Button("Open Gizmo Window"))
             {
-                GizmoWindow.ShowWindow();
+                GizmoWindow.ShowWindow((SceneGizmoAsset)this.target);
             }
             base.OnInspectorGUI();
         }
