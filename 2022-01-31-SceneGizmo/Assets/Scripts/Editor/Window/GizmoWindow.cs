@@ -12,16 +12,21 @@ namespace Rendu.Ulysse.editor
 #if UNITY_EDITOR
     public class GizmoWindow : EditorWindow
     {
-        // Window fields
+        // --- Window fields
         [SerializeField] private SceneGizmoAsset _gizmoAsset;
         
-        
-        // Window Creation
+        // --- Window Creation
         #region WindowCreation
         private const string _windowName = "Gizmo Editor";
 
         [MenuItem("UlysseTools/Windows/" + _windowName)]
-        public static void ShowWindow(SceneGizmoAsset gizmoAsset = null)
+        public static void ShowWindow()
+        {
+            GizmoWindow window = GetWindow<GizmoWindow>(_windowName);
+        }
+        
+        [MenuItem("UlysseTools/Windows/" + _windowName)]
+        public static void ShowWindow(SceneGizmoAsset gizmoAsset)
         {
             GizmoWindow window = GetWindow<GizmoWindow>(_windowName);
             if (gizmoAsset)
