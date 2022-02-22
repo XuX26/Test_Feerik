@@ -51,19 +51,19 @@ namespace Rendu.Ulysse.editor
             GUILayout.Label("Name", EditorStyles.boldLabel);
             GUILayout.Label("Position", EditorStyles.boldLabel);
             GUILayout.EndHorizontal();
-            
-            foreach (Gizmo gizmo in _gizmoAsset.Gizmos)
+
+            for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
             {
-                DisplayGizmos(gizmo);
+                DisplayGizmos(ref _gizmoAsset.Gizmos[i]);
             }
         }
 
-        void DisplayGizmos(Gizmo gizmo)
+        void DisplayGizmos(ref Gizmo gizmo)
         {
             GUILayout.BeginHorizontal();
-            EditorGUILayout.TextField(gizmo.Name, GUILayout.MaxWidth(_shortWidthField));
+            gizmo.Name = EditorGUILayout.TextField(gizmo.Name, GUILayout.MaxWidth(_shortWidthField));
             GUILayout.Space(10);
-            EditorGUILayout.Vector3Field("", gizmo.Position, GUILayout.MaxWidth(400));
+            gizmo.Position = EditorGUILayout.Vector3Field("", gizmo.Position, GUILayout.MaxWidth(400));
             GUILayout.EndHorizontal();
         }
         
