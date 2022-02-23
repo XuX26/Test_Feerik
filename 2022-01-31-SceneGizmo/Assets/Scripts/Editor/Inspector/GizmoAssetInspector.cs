@@ -7,8 +7,7 @@ using UnityEngine;
 namespace Rendu.Ulysse.editor
 {
     [CustomEditor(typeof(SceneGizmoAsset))]
-    //[CanEditMultipleObjects]
-    public class GizmosInspector : Editor
+    public class GizmoAssetInspector : Editor
     {
         public override void OnInspectorGUI()
         {
