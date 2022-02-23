@@ -89,10 +89,17 @@ namespace Rendu.Ulysse.editor
             for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
             {
                 Handles.Label(_gizmoAsset.Gizmos[i].Position, _gizmoAsset.Gizmos[i].Name);
-                DrawGizmoInSceneView(_gizmoAsset.Gizmos[i]);
+                DrawGizmoSphereInSceneView(_gizmoAsset.Gizmos[i]);
+                //DrawGizmoInSceneView(_gizmoAsset.Gizmos[i]);
             }
             Debug.Log("ONSCENEGUI!!!");
             sceneView.Repaint();
+        }
+
+        void DrawGizmoSphereInSceneView(Gizmo gizmo)
+        {
+            Handles.color = Color.white;
+            Handles.SphereHandleCap(1, gizmo.Position, Quaternion.identity, gizmoSize/3, EventType.Repaint);
         }
         
         void DrawGizmoInSceneView(Gizmo gizmo)
