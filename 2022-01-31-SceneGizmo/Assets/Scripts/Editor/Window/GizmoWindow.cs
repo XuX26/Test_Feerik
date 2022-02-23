@@ -15,10 +15,12 @@ namespace Rendu.Ulysse.editor
     public class GizmoWindow : EditorWindow
     {
         // --- Window fields
-        [SerializeField] private SceneGizmoAsset _gizmoAsset;
-
-        private int _shortWidthField = 200;
+        public static GizmoWindow Instance { get; private set; }
+        public static bool IsOpen => Instance != null;
         
+        [SerializeField] private SceneGizmoAsset _gizmoAsset;
+        private int _shortWidthField = 200;
+
         // --- Window Creation
         #region WindowCreation
         private const string _windowName = "Gizmo Editor";
@@ -27,6 +29,7 @@ namespace Rendu.Ulysse.editor
         public static void ShowWindow()
         {
             GizmoWindow window = GetWindow<GizmoWindow>(_windowName);
+            Instance = window;
         }
         
         [MenuItem("Window/Custom/" + _windowName)]
@@ -38,6 +41,18 @@ namespace Rendu.Ulysse.editor
                 window._gizmoAsset = gizmoAsset;
                 Debug.Log(window._gizmoAsset.ToString());
             }
+        }
+        
+        void OnEnable()
+        {
+            SceneView.duringSceneGui += OnSceneGUI;
+            Debug.Log("GizmoWindow created!");
+        }
+        
+        void OnDestroy()
+        {
+            SceneView.duringSceneGui -= OnSceneGUI;
+            Debug.Log("GizmoWindow destroyed!");
         }
         #endregion
         
@@ -54,11 +69,11 @@ namespace Rendu.Ulysse.editor
 
             for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
             {
-                DisplayGizmos(ref _gizmoAsset.Gizmos[i]);
+                UpdateGizmoInWindow(ref _gizmoAsset.Gizmos[i]);
             }
         }
 
-        void DisplayGizmos(ref Gizmo gizmo)
+        void UpdateGizmoInWindow(ref Gizmo gizmo)
         {
             GUILayout.BeginHorizontal();
             gizmo.Name = EditorGUILayout.TextField(gizmo.Name, GUILayout.MaxWidth(_shortWidthField));
@@ -66,8 +81,21 @@ namespace Rendu.Ulysse.editor
             gizmo.Position = EditorGUILayout.Vector3Field("", gizmo.Position, GUILayout.MaxWidth(400));
             GUILayout.EndHorizontal();
         }
-        
         #endregion
+        
+        void OnSceneGUI(SceneView sceneView)
+        {
+            for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
+            {
+                DrawGizmoInSceneView(_gizmoAsset.Gizmos[i]);
+            }
+            Debug.Log("ONSCENEGUI!!!");
+        }
+        
+        void DrawGizmoInSceneView(Gizmo gizmo)
+        {
+            Handles.Label(gizmo.Position, gizmo.Name);
+        }
     }
 #endif
 }
