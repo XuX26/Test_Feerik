@@ -20,7 +20,11 @@ namespace Rendu.Ulysse.editor
         
         [SerializeField] private SceneGizmoAsset _gizmoAsset;
         private float gizmoSize = 0.5f;
+        
         private int _shortWidthField = 200;
+        private int _shortWidthButton = 75;
+        private bool _isEditingAllGizmo = false;
+        private Dictionary<Gizmo, bool> _isEditableGizmoDic = new Dictionary<Gizmo, bool>();
 
         // --- Window Creation
         #region WindowCreation
@@ -62,10 +66,15 @@ namespace Rendu.Ulysse.editor
         void OnGUI()
         {
             _gizmoAsset = EditorGUILayout.ObjectField("Gizmo Asset", _gizmoAsset, typeof(SceneGizmoAsset)) as SceneGizmoAsset;
+            if (_gizmoAsset == null)
+                return;
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Name", EditorStyles.boldLabel);
+            GUILayout.Label("Name", EditorStyles.boldLabel, GUILayout.Width(_shortWidthField));
+            GUILayout.FlexibleSpace();
             GUILayout.Label("Position", EditorStyles.boldLabel);
+            GUILayout.FlexibleSpace();
+            UpdateEditAllButton();
             GUILayout.EndHorizontal();
 
             for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
@@ -74,13 +83,43 @@ namespace Rendu.Ulysse.editor
             }
         }
 
+        void UpdateEditAllButton()
+        {
+            _isEditingAllGizmo = GUILayout.Toggle(_isEditingAllGizmo, "Edit All", "Button",
+                GUILayout.Width(_shortWidthButton));
+            if (GUI.changed)
+            {
+                for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
+                {
+                    if (_isEditableGizmoDic.ContainsKey(_gizmoAsset.Gizmos[i]))
+                    {
+                        _isEditableGizmoDic[_gizmoAsset.Gizmos[i]] = _isEditingAllGizmo;
+                    }
+                }
+            }
+        }
+
+
         void UpdateGizmoInWindow(ref Gizmo gizmo)
         {
             GUILayout.BeginHorizontal();
-            gizmo.Name = EditorGUILayout.TextField(gizmo.Name, GUILayout.MaxWidth(_shortWidthField));
+            gizmo.Name = EditorGUILayout.TextField(gizmo.Name, GUILayout.Width(_shortWidthField));
             GUILayout.Space(10);
+            GUILayout.FlexibleSpace();
             gizmo.Position = EditorGUILayout.Vector3Field("", gizmo.Position, GUILayout.MaxWidth(400));
+            GUILayout.FlexibleSpace();
+            UpdateEditButton(ref gizmo);
+            //_isEditableGizmoDic[gizmo] = GUILayout.Toggle(_isEditableGizmoDic[gizmo], "Edit", "Button", GUILayout.Width(_shortWidthButton));
             GUILayout.EndHorizontal();
+        }
+
+        void UpdateEditButton(ref Gizmo gizmo)
+        {
+            if (!_isEditableGizmoDic.ContainsKey(gizmo))
+            {
+                _isEditableGizmoDic.Add(gizmo, false);
+            }
+            _isEditableGizmoDic[gizmo] = GUILayout.Toggle(_isEditableGizmoDic[gizmo], "Edit", "Button", GUILayout.Width(_shortWidthButton));
         }
         #endregion
         
@@ -90,9 +129,9 @@ namespace Rendu.Ulysse.editor
             {
                 Handles.Label(_gizmoAsset.Gizmos[i].Position, _gizmoAsset.Gizmos[i].Name);
                 DrawGizmoSphereInSceneView(_gizmoAsset.Gizmos[i]);
+                if (_isEditableGizmoDic[_gizmoAsset.Gizmos[i]])
+                    ActiveGizmoEditMode(ref _gizmoAsset.Gizmos[i]);
             }
-            
-            //ActiveGizmoEditMode(ref _gizmoAsset.Gizmos[i]);
             Debug.Log("ONSCENEGUI!!!");
             sceneView.Repaint();
         }
