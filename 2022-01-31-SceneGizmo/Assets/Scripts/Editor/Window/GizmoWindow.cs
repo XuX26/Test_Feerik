@@ -90,8 +90,9 @@ namespace Rendu.Ulysse.editor
             {
                 Handles.Label(_gizmoAsset.Gizmos[i].Position, _gizmoAsset.Gizmos[i].Name);
                 DrawGizmoSphereInSceneView(_gizmoAsset.Gizmos[i]);
-                //DrawGizmoInSceneView(_gizmoAsset.Gizmos[i]);
             }
+            
+            //ActiveGizmoEditMode(ref _gizmoAsset.Gizmos[i]);
             Debug.Log("ONSCENEGUI!!!");
             sceneView.Repaint();
         }
@@ -102,17 +103,9 @@ namespace Rendu.Ulysse.editor
             Handles.SphereHandleCap(1, gizmo.Position, Quaternion.identity, gizmoSize/3, EventType.Repaint);
         }
         
-        void DrawGizmoInSceneView(Gizmo gizmo)
+        void ActiveGizmoEditMode(ref Gizmo gizmo)
         {
-            // X axis
-            Handles.color = Color.red;
-            Handles.ArrowHandleCap(1, gizmo.Position, Quaternion.LookRotation(Vector3.right), gizmoSize, EventType.Repaint);
-            // Y axis
-            Handles.color = Color.green;
-            Handles.ArrowHandleCap(0, gizmo.Position, Quaternion.LookRotation(Vector3.up), gizmoSize, EventType.Repaint);
-            // Z axis
-            Handles.color = Color.blue;
-            Handles.ArrowHandleCap(0, gizmo.Position, Quaternion.identity, gizmoSize, EventType.Repaint);
+            gizmo.Position = Handles.PositionHandle(gizmo.Position, Quaternion.identity);
         }
     }
 #endif
