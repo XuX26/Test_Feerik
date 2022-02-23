@@ -61,7 +61,7 @@ namespace Rendu.Ulysse.editor
         #region Window Display
         void OnGUI()
         {
-            EditorGUILayout.ObjectField("Gizmo Asset", _gizmoAsset, typeof(SceneGizmoAsset));
+            _gizmoAsset = EditorGUILayout.ObjectField("Gizmo Asset", _gizmoAsset, typeof(SceneGizmoAsset)) as SceneGizmoAsset;
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Name", EditorStyles.boldLabel);
