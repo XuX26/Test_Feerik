@@ -19,6 +19,7 @@ namespace Rendu.Ulysse.editor
         public static bool IsOpen => Instance != null;
         
         [SerializeField] private SceneGizmoAsset _gizmoAsset;
+        private float gizmoSize = 0.5f;
         private int _shortWidthField = 200;
 
         // --- Window Creation
@@ -87,14 +88,24 @@ namespace Rendu.Ulysse.editor
         {
             for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
             {
+                Handles.Label(_gizmoAsset.Gizmos[i].Position, _gizmoAsset.Gizmos[i].Name);
                 DrawGizmoInSceneView(_gizmoAsset.Gizmos[i]);
             }
             Debug.Log("ONSCENEGUI!!!");
+            sceneView.Repaint();
         }
         
         void DrawGizmoInSceneView(Gizmo gizmo)
         {
-            Handles.Label(gizmo.Position, gizmo.Name);
+            // X axis
+            Handles.color = Color.red;
+            Handles.ArrowHandleCap(1, gizmo.Position, Quaternion.LookRotation(Vector3.right), gizmoSize, EventType.Repaint);
+            // Y axis
+            Handles.color = Color.green;
+            Handles.ArrowHandleCap(0, gizmo.Position, Quaternion.LookRotation(Vector3.up), gizmoSize, EventType.Repaint);
+            // Z axis
+            Handles.color = Color.blue;
+            Handles.ArrowHandleCap(0, gizmo.Position, Quaternion.identity, gizmoSize, EventType.Repaint);
         }
     }
 #endif
