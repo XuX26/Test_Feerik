@@ -23,13 +23,13 @@ namespace Rendu.Ulysse.editor
         #region WindowCreation
         private const string _windowName = "Gizmo Editor";
 
-        [MenuItem("UlysseTools/Windows/" + _windowName)]
+        [MenuItem("Window/Custom/" + _windowName)]
         public static void ShowWindow()
         {
             GizmoWindow window = GetWindow<GizmoWindow>(_windowName);
         }
         
-        [MenuItem("UlysseTools/Windows/" + _windowName)]
+        [MenuItem("Window/Custom/" + _windowName)]
         public static void ShowWindow(SceneGizmoAsset gizmoAsset)
         {
             GizmoWindow window = GetWindow<GizmoWindow>(_windowName);
