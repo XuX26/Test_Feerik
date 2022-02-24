@@ -24,7 +24,9 @@ namespace Rendu.Ulysse.editor
         // private Dictionary<Gizmo, bool> _isEditableGizmoDic = new Dictionary<Gizmo, bool>();
         // private List<bool> _isEditableGizmoList = new List<bool>();
         
-        private float gizmoSize = 0.5f;
+        private float sphereSize = 0.5f;
+        private Color sphereColor = Color.white;
+        //private Texture2D imgCopy;
         
         private int _shortWidthField = 200;
         private int _shortWidthButton = 75;
@@ -92,10 +94,12 @@ namespace Rendu.Ulysse.editor
         }
         #endregion
         
+        
         // --- Window Display 
         #region Window Display
         void OnGUI()
         {
+            GUILayout.Label(_gizmoAsset.name, EditorStyles.boldLabel);
             SceneGizmoAsset tmpGizmoAsset = EditorGUILayout.ObjectField("Gizmo Asset", _gizmoAsset, typeof(SceneGizmoAsset)) as SceneGizmoAsset;
             if (!tmpGizmoAsset) return;
             if (_gizmoAsset != tmpGizmoAsset)
@@ -103,19 +107,33 @@ namespace Rendu.Ulysse.editor
                 SetGizmoAsset(tmpGizmoAsset);
             }
             
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Name", EditorStyles.boldLabel, GUILayout.Width(_shortWidthField));
-            GUILayout.FlexibleSpace();
-            GUILayout.Label("Position", EditorStyles.boldLabel);
-            GUILayout.FlexibleSpace();
-            UpdateEditAllButton();
-            GUILayout.EndHorizontal();
-
+            GUIWindowHeaders();
+            
+            // Update and Display variables on every Gizmo
             for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
             {
                 UpdateGizmoInWindow(ref _gizmoAsset.Gizmos[i], i);
             }
+
+            // Footer included tool tweaks (Handles Size)
+            GUIWindowFooter();
+            
             Repaint();
+        }
+
+        void GUIWindowHeaders()
+        {
+            GUILayout.Space(10);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Name", EditorStyles.boldLabel, GUILayout.Width(_shortWidthField));
+            
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("Position", EditorStyles.boldLabel);
+            GUILayout.FlexibleSpace();
+            
+            UpdateEditAllButton();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(10);
         }
 
         void UpdateEditAllButton()
@@ -145,6 +163,9 @@ namespace Rendu.Ulysse.editor
             
             GUILayout.FlexibleSpace();
             gizmo.Position = EditorGUILayout.Vector3Field("", gizmo.Position, GUILayout.MaxWidth(400));
+            //if (GUILayout.Button(imgCopy, GUILayout.Width(20), GUILayout.Height(20)))
+            if (GUILayout.Button("Copy", GUILayout.Width(50)))
+                GUIUtility.systemCopyBuffer = gizmo.Position.ToString();
             GUILayout.FlexibleSpace();
             
             UpdateEditButton(index);
@@ -160,7 +181,22 @@ namespace Rendu.Ulysse.editor
                 _gizmoHandlerList[index].UpdateHandlerPositions();
             }
         }
+
+        void GUIWindowFooter()
+        {
+            GUILayout.Space(15);
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("Sphere Size");
+            sphereSize = EditorGUILayout.Slider(sphereSize, 0.1f, 1f,  GUILayout.Width(_shortWidthField));
+            GUILayout.FlexibleSpace();
+            GUILayout.Label("Sphere Color");
+            sphereColor = EditorGUILayout.ColorField(sphereColor);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
         #endregion
+
         
         // --- Scene Display
         #region Scene Display
@@ -176,8 +212,6 @@ namespace Rendu.Ulysse.editor
                 Handles.Label(_gizmoAsset.Gizmos[i].Position + Vector3.up, _gizmoAsset.Gizmos[i].Name);
                 Handles.DrawLine(_gizmoAsset.Gizmos[i].Position + Vector3.up * 0.8f, _gizmoAsset.Gizmos[i].Position);
                 DrawGizmoSphereInSceneView(_gizmoAsset.Gizmos[i], i);
-                //if (_isEditableGizmoDic.TryGetValue(_gizmoAsset.Gizmos[i], out bool isEditable) && isEditable)
-                //if (_isEditableGizmoList[i])
                 if (_gizmoHandlerList[i].IsEditable)
                         ActiveGizmoEditMode(ref _gizmoAsset.Gizmos[i]);
             }
@@ -192,8 +226,8 @@ namespace Rendu.Ulysse.editor
 
         void DrawGizmoSphereInSceneView(Gizmo gizmo, int index)
         {
-            Handles.color = Color.white;
-            Handles.SphereHandleCap(index, gizmo.Position, Quaternion.identity, gizmoSize/3, EventType.Repaint);
+            Handles.color = sphereColor;
+            Handles.SphereHandleCap(index, gizmo.Position, Quaternion.identity, sphereSize, EventType.Repaint);
         }
         
         void ActiveGizmoEditMode(ref Gizmo gizmo)
@@ -201,7 +235,6 @@ namespace Rendu.Ulysse.editor
             gizmo.Position = Handles.PositionHandle(gizmo.Position, Quaternion.identity);
         }
         #endregion
-
     }
 #endif
 }
