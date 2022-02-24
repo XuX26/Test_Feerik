@@ -184,7 +184,7 @@ namespace Rendu.Ulysse.editor
 
             if (EditorGUI.EndChangeCheck())
             {
-                Undo.RecordObject(_gizmoAsset, "_gizmoAsset changed");
+                Undo.RegisterCompleteObjectUndo(_gizmoAsset, "_gizmoAsset changed");
             }
 
             sceneView.Repaint();
