@@ -135,9 +135,12 @@ namespace Rendu.Ulysse.editor
 
         void UpdateGizmoInWindow(ref Gizmo gizmo, int index)
         {
+            EditorStyles.textField.normal.textColor = _gizmoHandlerList[index].IsEditable ? Color.red : Color.white;
             GUILayout.BeginHorizontal();
-            gizmo.Name = EditorGUILayout.TextField(gizmo.Name, GUILayout.Width(_shortWidthField));
+            
+            gizmo.Name = EditorGUILayout.TextField(gizmo.Name,GUILayout.Width(_shortWidthField));
             GUILayout.Space(10);
+            
             GUILayout.FlexibleSpace();
             gizmo.Position = EditorGUILayout.Vector3Field("", gizmo.Position, GUILayout.MaxWidth(400));
             GUILayout.FlexibleSpace();
