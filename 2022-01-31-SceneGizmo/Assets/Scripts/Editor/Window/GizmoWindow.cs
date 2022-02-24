@@ -48,8 +48,34 @@ namespace Rendu.Ulysse.editor
             GizmoWindow window = GetWindow<GizmoWindow>(_windowName);
             if (gizmoAsset)
             {
-                window._gizmoAsset = gizmoAsset;
-                Debug.Log(window._gizmoAsset.ToString());
+                window.SetGizmoAsset(gizmoAsset);
+            }
+        }
+
+        void SetGizmoAsset(SceneGizmoAsset newGizmoAsset)
+        {
+            if (_gizmoAsset != newGizmoAsset)
+            {
+                Debug.Log("Asset Gizmo changed");
+                _gizmoAsset = newGizmoAsset;
+                InitVariables();
+            }
+        }
+
+        void InitVariables()
+        {
+            InitGizmoHandlerList();
+        }
+
+        void InitGizmoHandlerList()
+        {
+            if (_gizmoAsset.Gizmos.Length != _gizmoHandlerList.Count)
+            {
+                _gizmoHandlerList.Clear();
+                for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
+                {
+                    _gizmoHandlerList.Add(new GizmoHandler(_gizmoAsset.Gizmos[i]));
+                }
             }
         }
         
@@ -70,10 +96,13 @@ namespace Rendu.Ulysse.editor
         #region Window Display
         void OnGUI()
         {
-            _gizmoAsset = EditorGUILayout.ObjectField("Gizmo Asset", _gizmoAsset, typeof(SceneGizmoAsset)) as SceneGizmoAsset;
-            if (_gizmoAsset == null)
-                return;
-
+            SceneGizmoAsset tmpGizmoAsset = EditorGUILayout.ObjectField("Gizmo Asset", _gizmoAsset, typeof(SceneGizmoAsset)) as SceneGizmoAsset;
+            if (!tmpGizmoAsset) return;
+            if (_gizmoAsset != tmpGizmoAsset)
+            {
+                SetGizmoAsset(tmpGizmoAsset);
+            }
+            
             GUILayout.BeginHorizontal();
             GUILayout.Label("Name", EditorStyles.boldLabel, GUILayout.Width(_shortWidthField));
             GUILayout.FlexibleSpace();
