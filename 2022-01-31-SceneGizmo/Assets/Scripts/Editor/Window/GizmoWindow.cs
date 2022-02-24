@@ -19,12 +19,17 @@ namespace Rendu.Ulysse.editor
         public static bool IsOpen => Instance != null;
         
         [SerializeField] private SceneGizmoAsset _gizmoAsset;
+        private List<GizmoHandler> _gizmoHandlerList = new List<GizmoHandler>();
+        // I tried many ways before using a GizmoHandler
+        // private Dictionary<Gizmo, bool> _isEditableGizmoDic = new Dictionary<Gizmo, bool>();
+        // private List<bool> _isEditableGizmoList = new List<bool>();
+        
         private float gizmoSize = 0.5f;
         
         private int _shortWidthField = 200;
         private int _shortWidthButton = 75;
         private bool _isEditingAllGizmo = false;
-        private Dictionary<Gizmo, bool> _isEditableGizmoDic = new Dictionary<Gizmo, bool>();
+       
 
         // --- Window Creation
         #region WindowCreation
@@ -79,8 +84,9 @@ namespace Rendu.Ulysse.editor
 
             for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
             {
-                UpdateGizmoInWindow(ref _gizmoAsset.Gizmos[i]);
+                UpdateGizmoInWindow(ref _gizmoAsset.Gizmos[i], i);
             }
+            Repaint();
         }
 
         void UpdateEditAllButton()
@@ -89,18 +95,16 @@ namespace Rendu.Ulysse.editor
                 GUILayout.Width(_shortWidthButton));
             if (GUI.changed)
             {
+                if (_gizmoAsset.Gizmos.Length != _gizmoHandlerList.Count)
+                    _gizmoHandlerList.Clear();
                 for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
                 {
-                    if (_isEditableGizmoDic.ContainsKey(_gizmoAsset.Gizmos[i]))
-                    {
-                        _isEditableGizmoDic[_gizmoAsset.Gizmos[i]] = _isEditingAllGizmo;
-                    }
+                    _gizmoHandlerList.Add(new GizmoHandler(_gizmoAsset.Gizmos[i]));
                 }
             }
         }
 
-
-        void UpdateGizmoInWindow(ref Gizmo gizmo)
+        void UpdateGizmoInWindow(ref Gizmo gizmo, int index)
         {
             GUILayout.BeginHorizontal();
             gizmo.Name = EditorGUILayout.TextField(gizmo.Name, GUILayout.Width(_shortWidthField));
@@ -108,44 +112,61 @@ namespace Rendu.Ulysse.editor
             GUILayout.FlexibleSpace();
             gizmo.Position = EditorGUILayout.Vector3Field("", gizmo.Position, GUILayout.MaxWidth(400));
             GUILayout.FlexibleSpace();
-            UpdateEditButton(ref gizmo);
-            //_isEditableGizmoDic[gizmo] = GUILayout.Toggle(_isEditableGizmoDic[gizmo], "Edit", "Button", GUILayout.Width(_shortWidthButton));
+            
+            UpdateEditButton(index);
             GUILayout.EndHorizontal();
         }
-
-        void UpdateEditButton(ref Gizmo gizmo)
+        
+        void UpdateEditButton(int index)
         {
-            if (!_isEditableGizmoDic.ContainsKey(gizmo))
+            _gizmoHandlerList[index].IsEditable = GUILayout.Toggle(_gizmoHandlerList[index].IsEditable, "Edit", "Button", GUILayout.Width(_shortWidthButton));
+
+            if (GUI.changed)
             {
-                _isEditableGizmoDic.Add(gizmo, false);
+                _gizmoHandlerList[index].UpdateHandlerPositions();
             }
-            _isEditableGizmoDic[gizmo] = GUILayout.Toggle(_isEditableGizmoDic[gizmo], "Edit", "Button", GUILayout.Width(_shortWidthButton));
         }
         #endregion
         
+        // --- Scene Display
+        #region Scene Display
         void OnSceneGUI(SceneView sceneView)
         {
+            if (!_gizmoAsset) return;
+            
+            EditorGUI.BeginChangeCheck();
+                
             for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
             {
+                _gizmoHandlerList[i].controlId = GUIUtility.GetControlID(FocusType.Passive);
                 Handles.Label(_gizmoAsset.Gizmos[i].Position, _gizmoAsset.Gizmos[i].Name);
-                DrawGizmoSphereInSceneView(_gizmoAsset.Gizmos[i]);
-                if (_isEditableGizmoDic[_gizmoAsset.Gizmos[i]])
-                    ActiveGizmoEditMode(ref _gizmoAsset.Gizmos[i]);
+                DrawGizmoSphereInSceneView(_gizmoAsset.Gizmos[i], i);
+                //if (_isEditableGizmoDic.TryGetValue(_gizmoAsset.Gizmos[i], out bool isEditable) && isEditable)
+                //if (_isEditableGizmoList[i])
+                if (_gizmoHandlerList[i].IsEditable)
+                        ActiveGizmoEditMode(ref _gizmoAsset.Gizmos[i]);
             }
-            Debug.Log("ONSCENEGUI!!!");
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(_gizmoAsset, "_gizmoAsset changed");
+            }
+
             sceneView.Repaint();
         }
 
-        void DrawGizmoSphereInSceneView(Gizmo gizmo)
+        void DrawGizmoSphereInSceneView(Gizmo gizmo, int index)
         {
             Handles.color = Color.white;
-            Handles.SphereHandleCap(1, gizmo.Position, Quaternion.identity, gizmoSize/3, EventType.Repaint);
+            Handles.SphereHandleCap(index, gizmo.Position, Quaternion.identity, gizmoSize/3, EventType.Repaint);
         }
         
         void ActiveGizmoEditMode(ref Gizmo gizmo)
         {
             gizmo.Position = Handles.PositionHandle(gizmo.Position, Quaternion.identity);
         }
+        #endregion
+
     }
 #endif
 }
