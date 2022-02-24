@@ -125,10 +125,12 @@ namespace Rendu.Ulysse.editor
             if (GUI.changed)
             {
                 if (_gizmoAsset.Gizmos.Length != _gizmoHandlerList.Count)
-                    _gizmoHandlerList.Clear();
+                    InitGizmoHandlerList();
+                
                 for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
                 {
-                    _gizmoHandlerList.Add(new GizmoHandler(_gizmoAsset.Gizmos[i]));
+                    _gizmoHandlerList[i].IsEditable = _isEditingAllGizmo;
+                    //_gizmoHandlerList.Add(new GizmoHandler(_gizmoAsset.Gizmos[i]));
                 }
             }
         }
