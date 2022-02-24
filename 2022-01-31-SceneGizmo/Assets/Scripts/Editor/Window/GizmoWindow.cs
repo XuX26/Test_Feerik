@@ -171,7 +171,8 @@ namespace Rendu.Ulysse.editor
             for (int i = 0; i < _gizmoAsset.Gizmos.Length; i++)
             {
                 _gizmoHandlerList[i].controlId = GUIUtility.GetControlID(FocusType.Passive);
-                Handles.Label(_gizmoAsset.Gizmos[i].Position, _gizmoAsset.Gizmos[i].Name);
+                Handles.Label(_gizmoAsset.Gizmos[i].Position + Vector3.up, _gizmoAsset.Gizmos[i].Name);
+                Handles.DrawLine(_gizmoAsset.Gizmos[i].Position + Vector3.up * 0.8f, _gizmoAsset.Gizmos[i].Position);
                 DrawGizmoSphereInSceneView(_gizmoAsset.Gizmos[i], i);
                 //if (_isEditableGizmoDic.TryGetValue(_gizmoAsset.Gizmos[i], out bool isEditable) && isEditable)
                 //if (_isEditableGizmoList[i])
